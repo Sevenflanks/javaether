@@ -371,7 +371,7 @@ public class HelloWorldAdapter implements Runnable {
       @Override
       public void onTransactionExecuted(TransactionExecutionSummary summary) {
         summary.getLogs().stream()
-//          .filter(l -> "56033Cf6B4Ff05ce63e48420d3A6142a593473c0".equalsIgnoreCase(Hex.toHexString(l.getAddress())))
+          .filter(l -> "3B584F3d1E4F4462B684bEE0f7Fb96D03b807C0F".equalsIgnoreCase(Hex.toHexString(l.getAddress())))
           .forEach(l -> {
             StringBuilder topicsStr = new StringBuilder();
             topicsStr.append("[");
@@ -387,7 +387,8 @@ public class HelloWorldAdapter implements Runnable {
                 "\tLogInfo:" + "\n" +
                 "\t address=" + Hex.toHexString(l.getAddress()) + "\n" +
                 "\t topics=" + topicsStr + "\n" +
-                "\t data=" + Hex.toHexString(l.getData()));
+                "\t data=" + Hex.toHexString(l.getData()) +
+                "\t Encoded=" + new String(l.getEncoded()));
           });
       }
   };
