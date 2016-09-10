@@ -5,7 +5,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PostConstruct;
@@ -29,7 +28,6 @@ import org.ethereum.net.p2p.HelloMessage;
 import org.ethereum.net.rlpx.Node;
 import org.ethereum.net.server.Channel;
 import org.ethereum.util.ByteUtil;
-import org.ethereum.vm.DataWord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
@@ -314,23 +312,15 @@ public class HelloWorldAdapter implements Runnable {
 //              logger.info("PendingStateTransactions: " + ethereum.getPendingStateTransactions().size());
               
               if (!txs.isEmpty()) {
-                System.out.println("!!!!CallTransaction!!!!");
                 txs.stream().map(txp -> {
                   long nonce = ethereum.getRepository().getNonce(txp.getEcKey().getAddress()).longValue();
-                  long gas = (long)(Long.parseLong(Hex.toHexString(ethereum.getBlockchain().getBestBlock().getGasLimit()), 16) * 0.75);
+                  long gasLimit = Long.parseLong(Hex.toHexString(ethereum.getBlockchain().getBestBlock().getGasLimit()), 16);   
+                  long gas = (long)(gasLimit * 0.75);
                   Transaction tx = CallTransaction.createCallTransaction(nonce, ethereum.getGasPrice(), gas, txp.getToAddress(), txp.getValue(), txp.getFunction(), txp.getArgs());
                   tx.sign(txp.getEcKey());
+                  logger.info("Sending Transaction: nonce:{}, value:{}, Gas:{}, GasPrice:{}, GasLimit{}", nonce, txp.getValue(), gas, ethereum.getGasPrice(), gasLimit);
                   return tx;
-                }).map(ethereum::submitTransaction).forEach(f -> {
-                  Executors.newSingleThreadExecutor().submit(() -> {
-                    try {
-                      Transaction tx = f.get();
-                      System.out.println("!!!!TxCalled" + tx.toString());
-                    } catch (Exception e) {
-                      e.printStackTrace();
-                    }
-                  });
-                });
+                }).forEach(ethereum::submitTransaction);
                 txs.clear();
               }
               
@@ -373,22 +363,8 @@ public class HelloWorldAdapter implements Runnable {
         summary.getLogs().stream()
           .filter(l -> "3B584F3d1E4F4462B684bEE0f7Fb96D03b807C0F".equalsIgnoreCase(Hex.toHexString(l.getAddress())))
           .forEach(l -> {
-            StringBuilder topicsStr = new StringBuilder();
-            topicsStr.append("[");
-  
-            for (DataWord topic : l.getTopics()) {
-                String topicStr = Hex.toHexString(topic.getData());
-                topicsStr.append(topicStr).append(" ");
-            }
-            topicsStr.append("]");
-  
-  
-            System.out.println(
-                "\tLogInfo:" + "\n" +
-                "\t address=" + Hex.toHexString(l.getAddress()) + "\n" +
-                "\t topics=" + topicsStr + "\n" +
-                "\t data=" + Hex.toHexString(l.getData()) +
-                "\t Encoded=" + new String(l.getEncoded()));
+            logger.info(l.toString());
+            logger.info(Hex.toHexString(l.getEncoded()));
           });
       }
   };

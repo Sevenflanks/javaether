@@ -1,38 +1,14 @@
 package tw.com.softleader.javaether;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.ethereum.util.RLP;
 
-/**
- * Unit test for simple App.
- */
-public class AppTest 
-    extends TestCase
-{
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public AppTest( String testName )
-    {
-        super( testName );
-    }
+public class AppTest {
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( AppTest.class );
-    }
-
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
-    }
+  public static void main(String[] args) {
+    
+    String data = "000000000000000000000000cd2a3d9f938e13cd947ec05abc7fe734df8dd82668656c6c6f20776f726c640000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000de0b6b3a7640000";
+    System.out.println(new String(RLP.encodeElement(data.getBytes())));
+    
+  }
+  
 }
